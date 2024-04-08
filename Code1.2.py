@@ -2,10 +2,7 @@ def handle_command(command):
     argum = command.split()
     if argum[0] == "echo":
         strs = argum[1:]
-        sr = ""
-        for strv in strs:
-            sr += f"{strv} "
-        sr = sr[:-1]
+        sr = " ".join(strs)
         print(sr)
     elif argum[0] == "off" or argum[0] == "exit":
         return True  # Сигнал завершения программы
@@ -29,26 +26,30 @@ def handle_command(command):
         print("https://t.me/OSoPfPC - наш телеграмм канал\n")
     elif argum[0] == "cal":
         if len(argum) > 1:
-            i = ""
-            ii = argum[1:]
-            for t in ii:
-                i += f"{t} "
-            i[:-1]
-            print(eval(i))
+            try:
+                result = eval(" ".join(argum[1:]))
+                print(result)
+            except Exception as e:
+                print("Ошибка:", e)
         else:
-            print("Нету примера")
+            print("Нет примера")
     elif argum[0] == "wmol":
         if len(argum) == 3:
-            ForOp = argum[1:]
-            i = ForOp[0] - ForOp[1]
-            if i < 0:
-                print(f"{ForOp[0]} < {ForOp[1]}")
-            elif i > 0:
-                print(f"{ForOp[0]} > {ForOp[1]}")
-            else:
-                print(f"{ForOp[0]} = {ForOp[1]}")
+            try:
+                num1 = int(argum[1])
+                num2 = int(argum[2])
+                if num1 < num2:
+                    print(f"{num1} < {num2}")
+                elif num1 > num2:
+                    print(f"{num1} > {num2}")
+                else:
+                    print(f"{num1} = {num2}")
+            except ValueError:
+                print("Ошибка: Введите целые числа для сравнения")
+        else:
+            print("Ошибка: Неверное количество аргументов для команды 'wmol'")
     else:
-        print("Не верная команда")
+        print("Неизвестная команда")
     return False  # Сигнал продолжения работы программы
 
 def main():
