@@ -56,9 +56,9 @@ def handle_command(command):
                 nums_str += text
             nums_str = nums_str[:-1]
             nums = list(nums_str)
-            if len(nums) == 3:
+            if len(nums) == 2:
                 print(f"Сотней: {nums[0]}, Десяток: {nums[1]}, единиц: {nums[2]}")
-            elif len(nums) == 2:
+            elif len(nums) == 1:
                 print(f"Десяток: {nums[0]}, единиц: {nums[1]}")
             else:
                 print("Ошибка: нужно больше цифр")
