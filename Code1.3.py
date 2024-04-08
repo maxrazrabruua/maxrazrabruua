@@ -51,7 +51,11 @@ def handle_command(command):
     elif argum[0] == "split":
         if len(argum) == 2:
             num = argum[1:]
-            nums = num.split("")
+            nums_str = ""
+            for text in num:
+                nums_str += text
+            nums_str = nums_str[:-1]
+            nums = nums_str.split("")
             if len(nums) == 3:
                 print(f"Сотней: {nums[0]}, Десяток: {nums[1]}, единиц: {nums[2]}")
             elif len(nums) == 2:
