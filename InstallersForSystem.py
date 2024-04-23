@@ -13,3 +13,9 @@ def download(file_url, destination_path):
     except Exception as e:
         print("d:/" + "Ошибка при загрузке файла:", e)
         return False
+
+def opis():
+    return "d:/ Драйвер InstallersForSystem может скачивать файлы из интернета изпользуя функции которые в нём находятся"
+
+def name():
+    return "d:/ InstallersForSystem"
