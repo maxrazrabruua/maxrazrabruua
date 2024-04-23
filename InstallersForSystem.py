@@ -19,3 +19,6 @@ def opis():
 
 def name():
     return "d:/ InstallersForSystem"
+
+def help():
+    print("d:/ help - помощь\ndow (файл)- скачать файл")
