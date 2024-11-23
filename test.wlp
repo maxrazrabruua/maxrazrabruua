@@ -5,7 +5,7 @@ folder test_project
 echo Папка создана
 
 echo Запись файла...
-file /test_project/test_file.py
+file test_project/test_file.py
 print("hello world!")
 end
 echo Готово!
