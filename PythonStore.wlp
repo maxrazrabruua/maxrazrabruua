@@ -1,0 +1,189 @@
+// Python Store установщик
+
+folder PythonStore
+
+file PythonStore/main.py
+import os
+import random
+import requests
+
+# Функция обработки команд
+def inpretator_wlp(command, dones, file_mode, file_name, code):
+    # Разбиваем команду на части
+    com = command.split()
+    print(command)
+    
+    if not com:
+        return file_mode, file_name, code
+    
+    # Игнорируем комментарии
+    if com[0] == "//":
+        return file_mode, file_name, code
+
+    # Команда "echo" - выводит текст
+    elif com[0] == "echo":
+        if len(com) >= 2:
+            print(" ".join(com[1:]))
+        else:
+            return file_mode, file_name, code
+    
+    # Команда "folder" - создаёт папку
+    elif com[0] == "folder":
+        if len(com) == 2:
+            os.makedirs(dones + "/" + com[1], exist_ok=True)  # Создаём папку
+        else:
+            print("Ошибка: некорректная команда 'folder'")
+    
+    # Команда "file" - начинает запись в файл
+    elif com[0] == "file":
+        if file_mode:
+            print("Ошибка: файл уже открыт для записи")
+        else:
+            if len(com) == 2:
+                file_mode = True
+                file_name = com[1]
+            else:
+                print("Ошибка: некорректная команда 'file'")
+    
+    # Команда "end" - завершает запись в файл
+    elif com[0] == "end":
+        if file_mode:
+            if len(com) == 1:
+                if dones:
+                    # Применяем корректный путь
+                    try:
+                        file_path = dones + "/" + file_name
+                        with open(file_path, "w") as file:
+                            file.write(code)
+                        print(f"Файл сохранён по пути {file_path}")
+                    except Exception as e:
+                        print(f"Ошибка при записи в файл: {e}")
+                else:
+                    print("Ошибка: путь сохранения не задан.")
+            else:
+                print("Ошибка: команда 'end' не принимает дополнительных аргументов")
+            file_mode = False
+            file_name = ""
+        else:
+            print("Ошибка: нет открытого файла для записи")
+    
+    # Команда "pyc" - выполняет команды Python (безопасность!)
+    elif com[0] == "pyc":
+        if len(com) >= 2:
+            code_to_run = " ".join(com[1:])
+            print(f"Внимание: выполнение следующего кода: {code_to_run}")
+            # Здесь лучше всего избегать выполнения произвольного кода
+            confirm = input("Подтвердите выполнение кода (y для подтверждения): ")
+            if confirm == "y":
+                try:
+                    exec(code_to_run)
+                except Exception as e:
+                    print(f"Ошибка при выполнении кода: {e}")
+            else:
+                print("Выполнение кода отменено.")
+    
+    else:
+        # Если команда не распознана, добавляем её в код файла
+        if file_mode:
+            code += f"{' '.join(com)}\n"
+        else:
+            print(f"Ошибка: команда '{com[0]}' не распознана")
+
+    return file_mode, file_name, code
+
+
+# Главная программа
+def main():
+    while True:
+        os.system("cls")  # Очистка экрана
+        
+        # Получаем список программ с сервера
+        response = requests.get("https://raw.githubusercontent.com/maxrazrabruua/maxrazrabruua/main/list.json")
+        
+        if response.status_code == 200:
+            try:
+                data = response.json()  # Предполагаем, что получаем JSON
+                remProm = random.choice(list(data.keys()))  # Рандомная программа
+                print(f"Рекомендуемая программа: {remProm}")
+            except Exception as e:
+                print(f"Ошибка при обработке данных: {e}")
+        else:
+            print(f"Ошибка при получении списка файлов: {response.status_code}")
+            continue
+        
+        # Запрос имени программы
+        nameProm = input("Введите имя программы или оставьте пустым для рекомендации: ")
+        
+        if not nameProm:
+            response = requests.get(data[remProm])
+        else:
+            # Получаем установочный файл для выбранной программы
+            response = requests.get(f"https://raw.githubusercontent.com/maxrazrabruua/maxrazrabruua/main/{nameProm}.wlp")
+        
+        if response.status_code == 200:
+            dones = input("Введите путь для сохранения файла (или оставьте пустым для отмены): ")
+            os.makedirs(dones, exist_ok=True)  # Создаём папку
+            
+            if dones:
+                print("Начало установки...")
+                
+                file_mode = False
+                file_name = ""
+                code = ""
+                
+                # Проверяем содержимое установочного файла
+                if len(response.text) == 0:
+                    print("Ошибка s001: В установщике отсутствует контент.")
+                    continue
+                
+                # Обрабатываем команды из установочного файла
+                for command in response.text.split("\n"):
+                    file_mode, file_name, code = inpretator_wlp(command, dones, file_mode, file_name, code)
+        elif response.status_code == 404:
+            print("Ошибка 404: файл не был найден.")
+        else:
+            print(f"Ошибка при получении файла: {response.status_code}")
+
+# Запуск программы
+if __name__ == "__main__":
+    main()
+end
+
+file PythonStore/colorSintax.py
+import os
+import colorama as cl
+
+cl.init()
+
+sintax = {
+    "//": cl.Fore.GREEN + "//",
+    "echo": cl.Fore.YELLOW + "echo" + cl.Fore.RESET,
+    "folder": cl.Fore.YELLOW + "folder" + cl.Fore.RESET,
+    "file": cl.Fore.BLUE + "file" + cl.Fore.RESET,
+    "end": cl.Fore.BLUE + "end" + cl.Fore.RESET,
+    "pyc": cl.Fore.YELLOW + "pyc" + cl.Fore.RESET
+}
+
+while True:
+    file_name = input("Имя или путь до файла wlp: ") + ".wlp"
+    text = ""
+    # Открываем файл для чтения
+    with open(file_name, "r", encoding="utf-8") as file:
+        # Читаем файл построчно и добавляем каждую строку в список
+        lines = file.readlines()
+
+    # Убираем символ новой строки \n для каждой строки
+    lines = [line.strip() for line in lines]
+
+    for command in lines:
+        if len(command.split()) >= 1:
+            if command.split()[0] in sintax.keys():
+                text += sintax[command.split()[0]] + " " + " ".join(command.split()[1:])
+            else:
+                text += command.split()[0] + " " + " ".join(command.split()[1:]) + " "
+        text += "\n"
+    
+    print(text)
+end
+
+echo Готово!
