@@ -173,7 +173,7 @@ while True:
         lines = file.readlines()
 
     # Убираем символ новой строки \n для каждой строки
-    lines = [line.strip("\n") for line in lines]
+    lines = [line.strip() for line in lines]
 
     for command in lines:
         if len(command.split()) >= 1:
