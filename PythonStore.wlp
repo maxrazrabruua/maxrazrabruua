@@ -85,7 +85,7 @@ def inpretator_wlp(command, dones, file_mode, file_name, code):
     else:
         # Если команда не распознана, добавляем её в код файла
         if file_mode:
-            code += f"{' '.join(com)}\n"
+            code += command + "\n"
         else:
             print(f"Ошибка: команда '{com[0]}' не распознана")
 
